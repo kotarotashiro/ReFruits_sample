@@ -1923,23 +1923,25 @@ a {
 }
 
 .varieties-scroll::-webkit-scrollbar-thumb:hover {
-  background: var(--color-gray-400);
+  background: var(--color-primary-dark);
 }
 
 .varieties-grid {
-  display: grid;
-  grid-template-columns: repeat(10, minmax(280px, 1fr));
+  display: flex;
+  overflow-x: auto;
   gap: 1.5rem;
-  padding: 0 1rem;
+  padding-bottom: 1rem;
 }
 
 .variety-card {
-  background: white;
+  background: var(--color-background);
   border-radius: 1rem;
-  overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  transition: transform 0.2s ease-in-out;
-  min-width: 280px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px var(--color-shadow);
+  transition: all 0.3s ease;
+  border: 1px solid var(--color-border);
+  width: 280px;
+  flex: 0 0 auto;
 }
 
 .variety-card:hover {
@@ -1996,12 +1998,14 @@ a {
 
 @media (max-width: 768px) {
   .varieties-grid {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+    display: flex;
+    overflow-x: auto;
+    gap: 1rem;
   }
   
   .variety-card {
-    max-width: 400px;
-    margin: 0 auto;
+    min-width: 70vw;
+    flex: 0 0 auto;
+    scroll-snap-align: start;
   }
 }
