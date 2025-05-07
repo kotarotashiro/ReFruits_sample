@@ -39,41 +39,76 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Mini Map
   const miniMap = document.getElementById('mini-map');
-  if (miniMap) {
-    const mapPoints = [
-      { id: 1, x: 30, y: 40, title: "2m土壌ピット", description: "地層をのぞく" },
-      { id: 2, x: 70, y: 30, title: "草刈りバギーコース", description: "乗車OK" },
-      { id: 3, x: 50, y: 60, title: "トロッコレール", description: "撮影スポット" },
-      { id: 4, x: 80, y: 70, title: "キウイアーチ", description: "8月開花" },
-      { id: 5, x: 20, y: 80, title: "休憩エリア", description: "カフェあり" },
-    ];
+  const mapSpotsList = document.querySelector('.map-spots-list');
+  const mapPoints = [
+    { id: 1, x: 20, y: 20, title: "入口ゲート & サイン", description: "キウイの国の看板がお出迎え。写真撮影スポット" },
+    { id: 2, x: 50, y: 40, title: "キウイ棚田エリア", description: "広大なキウイ棚の区画。様々な品種を観察" },
+    { id: 3, x: 70, y: 30, title: "品種別区画", description: "珍しいキウイ品種を植えているエリア" },
+    { id: 4, x: 40, y: 60, title: "キウイトンネル", description: "緑のトンネルの中を歩く体験" },
+    { id: 5, x: 80, y: 70, title: "休憩スポット", description: "園の風景を眺めながら一息つける場所" },
+    { id: 6, x: 30, y: 80, title: "展望ポイント", description: "写真映えする絶景ポイント" },
+    { id: 7, x: 60, y: 50, title: "2m土壌ピット", description: "地層をのぞく" },
+    { id: 8, x: 90, y: 40, title: "草刈りバギーコース", description: "乗車OK" },
+    { id: 9, x: 10, y: 50, title: "トロッコレール", description: "撮影スポット" },
+    { id: 10, x: 85, y: 85, title: "キウイアーチ", description: "8月開花" }
+  ];
 
-    mapPoints.forEach(point => {
-      const mapPoint = document.createElement('button');
-      mapPoint.className = 'map-point';
-      mapPoint.style.left = `${point.x}%`;
-      mapPoint.style.top = `${point.y}%`;
-      mapPoint.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-        <div class="map-tooltip">
-          <div class="map-tooltip-title">${point.title}</div>
-          <div class="map-tooltip-desc">${point.description}</div>
-        </div>
-      `;
-      
-      mapPoint.addEventListener('click', function() {
-        const activePoint = miniMap.querySelector('.map-point.active');
-        if (activePoint === this) {
-          this.classList.remove('active');
-        } else {
-          if (activePoint) {
-            activePoint.classList.remove('active');
+  function isMobile() {
+    return window.innerWidth <= 767;
+  }
+
+  function renderMapPoints() {
+    if (!miniMap) return;
+    miniMap.querySelectorAll('.map-point').forEach(el => el.remove());
+    if (!isMobile()) {
+      mapPoints.forEach(point => {
+        const mapPoint = document.createElement('button');
+        mapPoint.className = 'map-point';
+        mapPoint.style.left = `${point.x}%`;
+        mapPoint.style.top = `${point.y}%`;
+        mapPoint.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+          <div class="map-tooltip">
+            <div class="map-tooltip-title">${point.title}</div>
+            <div class="map-tooltip-desc">${point.description}</div>
+          </div>
+        `;
+        mapPoint.addEventListener('click', function() {
+          const activePoint = miniMap.querySelector('.map-point.active');
+          if (activePoint === this) {
+            this.classList.remove('active');
+          } else {
+            if (activePoint) {
+              activePoint.classList.remove('active');
+            }
+            this.classList.add('active');
           }
-          this.classList.add('active');
-        }
+        });
+        miniMap.appendChild(mapPoint);
       });
-      
-      miniMap.appendChild(mapPoint);
+    }
+  }
+
+  function renderSpotsList() {
+    if (!mapSpotsList) return;
+    if (isMobile()) {
+      mapSpotsList.innerHTML = mapPoints.map(point => `
+        <div class="map-spot-item">
+          <div class="map-spot-title">${point.title}</div>
+          <div class="map-spot-desc">${point.description}</div>
+        </div>
+      `).join('');
+    } else {
+      mapSpotsList.innerHTML = '';
+    }
+  }
+
+  if (miniMap) {
+    renderMapPoints();
+    renderSpotsList();
+    window.addEventListener('resize', () => {
+      renderMapPoints();
+      renderSpotsList();
     });
   }
 
@@ -235,4 +270,78 @@ document.addEventListener('DOMContentLoaded', function() {
       animateCounter(counter);
     });
   }
+
+  // レビュー横スクロール矢印
+  (function() {
+    const grid = document.querySelector('.reviews-grid');
+    const left = document.querySelector('.reviews-arrow.left');
+    const right = document.querySelector('.reviews-arrow.right');
+    if (!grid || !left || !right) return;
+    const scrollAmount = grid.offsetWidth * 0.8;
+    left.addEventListener('click', function(e) {
+      grid.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+    });
+    right.addEventListener('click', function(e) {
+      grid.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    });
+  })();
+
+  // 品種紹介の自動スクロール
+  function initVarietiesScroll() {
+    const scrollContainer = document.querySelector('.varieties-scroll');
+    const scrollContent = document.querySelector('.varieties-grid');
+    let scrollPosition = 0;
+    const scrollSpeed = 1; // スクロール速度（ピクセル/フレーム）
+    let isScrolling = true;
+    let animationFrameId = null;
+
+    // スクロールアニメーション
+    function scrollAnimation() {
+      if (!isScrolling) return;
+
+      scrollPosition += scrollSpeed;
+      
+      // スクロール位置が最大を超えたら先頭に戻る
+      if (scrollPosition >= scrollContent.scrollWidth - scrollContainer.clientWidth) {
+        scrollPosition = 0;
+      }
+      
+      scrollContainer.scrollLeft = scrollPosition;
+      animationFrameId = requestAnimationFrame(scrollAnimation);
+    }
+
+    // マウスホバー時にスクロールを一時停止
+    scrollContainer.addEventListener('mouseenter', () => {
+      isScrolling = false;
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    });
+
+    // マウスが離れたらスクロールを再開
+    scrollContainer.addEventListener('mouseleave', () => {
+      isScrolling = true;
+      scrollAnimation();
+    });
+
+    // タッチ開始時にスクロールを一時停止
+    scrollContainer.addEventListener('touchstart', () => {
+      isScrolling = false;
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    });
+
+    // タッチ終了時にスクロールを再開
+    scrollContainer.addEventListener('touchend', () => {
+      isScrolling = true;
+      scrollAnimation();
+    });
+
+    // 初期スクロールの開始
+    scrollAnimation();
+  }
+
+  // ページ読み込み完了時に自動スクロールを開始
+  initVarietiesScroll();
 });
